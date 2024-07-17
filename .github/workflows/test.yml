@@ -46,8 +46,4 @@ jobs:
   #       script: |
   #         cd ~
   #         git clone <github-url>
-<<<<<<< HEAD
   #         cd <github-directory>
-=======
-  #         cd <github-directory>
->>>>>>> 9bdbc84 (updates)
