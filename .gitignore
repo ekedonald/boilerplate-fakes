@@ -25,6 +25,5 @@ logs/
 cronlogs/
 config.yaml
 _ignore/
-app.env
 tmp/
 .idea/
