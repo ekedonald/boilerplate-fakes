@@ -24,6 +24,8 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.22.1'
+    - name: Copy Environment Variables
+      run: cp app-sample.env app.env
     - name: Run The Project
       run: nohup go run main.go > /dev/null 2>&1 &
     - name: Wait for application to start
