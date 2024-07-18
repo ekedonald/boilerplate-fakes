@@ -27,3 +27,4 @@ config.yaml
 _ignore/
 tmp/
 .idea/
+second.yml

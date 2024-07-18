@@ -1,0 +1,49 @@
+#!/bin/bash
+
+DOMAIN_OR_IP="16.171.159.251"
+WEB_ROOT="/var/www/mystaticsite"
+CONFIG_FILE="/etc/nginx/conf.d/mystaticsite.conf"
+REPO_URL="https://github.com/vicradon/user-info-site.git"
+
+# Check if the script is run as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root. Use sudo."
+    exit 1
+fi
+
+sudo apt update && sudo apt install -y nginx || { echo "Failed to install Nginx"; exit 1; }
+
+sudo systemctl start nginx && sudo systemctl enable nginx || { echo "Failed to start or enable Nginx"; exit 1; }
+
+if [ ! -d "$WEB_ROOT" ]; then
+    sudo mkdir -p $WEB_ROOT || { echo "Failed to create web root directory"; exit 1; }
+fi
+
+if [ -d "$WEB_ROOT/.git" ]; then
+    # Navigate to the repository directory and pull changes
+    cd $WEB_ROOT || { echo "Failed to navigate to web root directory"; exit 1; }
+    sudo -u $USER git reset --hard HEAD || { echo "Failed to reset local changes"; exit 1; }
+    sudo -u $USER git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
+else
+    # Clone the repository into the web root directory
+    sudo -u $USER git clone $REPO_URL $WEB_ROOT || { echo "Failed to clone repository"; exit 1; }
+fi
+
+sudo chown -R $USER:$USER $WEB_ROOT || { echo "Failed to change ownership"; exit 1; }
+sudo chmod -R 755 $WEB_ROOT || { echo "Failed to set permissions"; exit 1; }
+
+echo "server {
+    listen 80;
+    server_name $DOMAIN_OR_IP;
+
+    root $WEB_ROOT;
+    index index.html index.htm;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}" | sudo tee $CONFIG_FILE || { echo "Failed to create Nginx configuration"; exit 1; }
+
+sudo nginx -t && sudo systemctl restart nginx || { echo "Nginx configuration test failed"; exit 1; }
+
+echo "Nginx is set up to serve your static website at http://$DOMAIN_OR_IP"
