@@ -5,15 +5,6 @@ DB_USER="postgres"
 DB_PASSWORD="password"
 DB_NAME="db_name"
 
-# Update package lists
-sudo apt-get update
-
-# Install GoLang
-sudo snap install go --classic
-
-# Install PostgreSQL
-sudo apt-get install -y postgresql postgresql-contrib
-
 # Check if the DB_USER is postgres and alter the password of this user else create a new user
 if [ "$DB_USER" == "postgres" ]; then
   sudo -i -u postgres psql <<EOF
