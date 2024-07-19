@@ -56,6 +56,17 @@ jobs:
       PROCESS_NAME: run_learnai_prod
 
     steps:
+      - name: Install Go
+        run: |
+          wget https://golang.org/dl/go1.22.1.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.22.1.linux-amd64.tar.gz
+          echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
+          source ~/.bashrc
+
+      - name: Install PM2
+        run: |
+          npm install -g pm2
+
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -65,14 +76,14 @@ jobs:
           port: ${{ env.PORT }}
           script: |
             export APPROOT=~/deployments/production
-            export PATH=$PATH:~/.nvm/versions/node/v20.15.1/bin
             export PATH=$PATH:/usr/local/go/bin
+            export PATH=$PATH:~/.nvm/versions/node/v20.15.1/bin
+            export PATH=$PATH:$(npm config get prefix)/bin
 
             mkdir -p $APPROOT
             cd $APPROOT
 
             if [ -d "$APPROOT/.git" ]; then
-                # Navigate to the repository directory and pull changes
                 cd $APPROOT || { echo "Failed to navigate to web root directory"; exit 1; }
                 git reset --hard HEAD || { echo "Failed to reset local changes"; exit 1; }
                 git pull origin main || { echo "Failed to pull latest changes"; exit 1; }
@@ -83,7 +94,6 @@ jobs:
             cp app-sample.env app.env
             go build -o ~/deployments/production/learnai_prod
 
-            # Check if pm2 is already running
             if pm2 list | grep -q "${{ env.PROCESS_NAME }}"; then
               echo "Process ${{ env.PROCESS_NAME }} is running. Restarting..."
               pm2 restart "${{ env.PROCESS_NAME }}"
