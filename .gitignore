@@ -30,4 +30,3 @@ tmp/
 second.yml
 app.env
 .DS_Store
-fake-build

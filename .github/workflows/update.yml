@@ -16,7 +16,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifact
-          path: fake-build
+          path: build_arts
       - name: Build the application
         run: go build -o learnai_prod
 
