@@ -30,3 +30,4 @@ tmp/
 second.yml
 app.env
 .DS_Store
+build_arts

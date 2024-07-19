@@ -12,6 +12,11 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: "1.22.1"
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: build_arts
       - name: Build the application
         run: go build -o learnai_prod
 
@@ -45,30 +50,30 @@ jobs:
       - name: Run All Tests
         run: go test ./... -timeout 99999s
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    env:
-      USERNAME: ${{ secrets.USERNAME }}
-      HOST: ${{ secrets.HOST }}
-      PORT: ${{ secrets.PORT }}
-      KEY: ${{ secrets.KEY }}
-      PROCESS_NAME: run_learnai_prod
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   env:
+  #     USERNAME: ${{ secrets.USERNAME }}
+  #     HOST: ${{ secrets.HOST }}
+  #     PORT: ${{ secrets.PORT }}
+  #     KEY: ${{ secrets.KEY }}
+  #     PROCESS_NAME: run_learnai_prod
 
-    steps:
-      - name: SSH into server and deploy
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ env.HOST }}
-          username: ${{ env.USERNAME }}
-          key: ${{ env.KEY}}
-          port: ${{ env.PORT }}
-          script: |
-            git clone https://github.com/ekedonald/boilerplate-fakes.git
-            cd boilerplate-fakes
-            sudo chmod +x old_main.sh
-            sudo ./old_main.sh
-            cp app-sample.env app.env
-            nohup go run main.go > /dev/null 2>&1 &
-            sleep 30s
-            curl http://localhost:8019
+  #   steps:
+  #     - name: SSH into server and deploy
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ env.HOST }}
+  #         username: ${{ env.USERNAME }}
+  #         key: ${{ env.KEY}}
+  #         port: ${{ env.PORT }}
+  #         script: |
+  #           git clone https://github.com/ekedonald/boilerplate-fakes.git
+  #           cd boilerplate-fakes
+  #           sudo chmod +x old_main.sh
+  #           sudo ./old_main.sh
+  #           cp app-sample.env app.env
+  #           nohup go run main.go > /dev/null 2>&1 &
+  #           sleep 30s
+  #           curl http://localhost:8019
