@@ -35,16 +35,9 @@ jobs:
     - name: Run All Tests
       run: go test ./... -timeout 99999s
     
-    - name: Download Environment Variables
-      uses: actions/download-artifact@v4
-      with:
-        name: env-artifact
-        path: .
-    - name: Copy Environment Variables
-      run: cp app-sample.env app.env
-
   # deployment:
   #   runs-on: ubuntu-latest
+  #   needs: build
   #   steps:
   #   - name: SSH Into server
   #     uses: appleboy/ssh-action@v0.1.10
