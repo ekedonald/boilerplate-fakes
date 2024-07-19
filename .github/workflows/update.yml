@@ -49,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      SSH_USERNAME: ${{ secrets.USERNAME }}
-      SSH_HOST: ${{ secrets.HOST }}
-      SSH_PORT: ${{ secrets.PORT }}
-      key: ${{ secrets.KEY }}
+      USERNAME: ${{ secrets.USERNAME }}
+      HOST: ${{ secrets.HOST }}
+      PORT: ${{ secrets.PORT }}
+      KEY: ${{ secrets.KEY }}
       PROCESS_NAME: run_learnai_prod
 
     steps:
