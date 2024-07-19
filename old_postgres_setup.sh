@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 # Variables for credentials
 DB_USER="postgres"
