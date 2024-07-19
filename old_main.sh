@@ -68,7 +68,7 @@ sudo apt install -y nginx
 # Configuring Nginx Reverse Proxy for the Production Server
 content='server {
     listen 80;
-    server_name 44.208.167.163;
+    server_name localhost;
     location / {
         proxy_pass http://127.0.0.1:8019;
         proxy_set_header Host $host;
@@ -78,6 +78,7 @@ content='server {
 
 echo "$content" | sudo tee $CONFIG_FILE > /dev/null
 sudo chmod 664 $CONFIG_FILE
+sudo sed -i "s/localhost/$DOMAIN_OR_IP/g" $CONFIG_FILE
 
 # Delete Default Nginx Webpage
 sudo rm /etc/nginx/sites-available/default && sudo rm /etc/nginx/sites-enabled/default
