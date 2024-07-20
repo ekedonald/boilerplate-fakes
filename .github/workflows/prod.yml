@@ -92,6 +92,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: learnai_prod_app_env_artifacts
+      - name: list files
+        run: ls -l
+      
       # - name: Create the app config file
       #   run: cp app-sample.env app.env
       - name: Run The Project
