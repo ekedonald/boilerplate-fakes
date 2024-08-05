@@ -5,6 +5,7 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -22,6 +23,7 @@ jobs:
       
   test:
     runs-on: ubuntu-latest
+    environment: production
     needs: build
     env:
       TEST_DB_HOST: localhost
