@@ -3,6 +3,7 @@ on: workflow_dispatch
 
 jobs:
   build:
+    environment: production
     env:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
