@@ -73,29 +73,29 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Calculate Change Failure Rate
-      - name: Calculate Change Failure Rate
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const { Octokit } = require("@octokit/rest");
-            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      # - name: Calculate Change Failure Rate
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       const { Octokit } = require("@octokit/rest");
+      #       const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-            const deployments = await octokit.repos.listDeployments({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
+      #       const deployments = await octokit.repos.listDeployments({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo
+      #       });
 
-            const failures = await octokit.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: 'deployment-failure'
-            });
+      #       const failures = await octokit.issues.listForRepo({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         labels: 'deployment-failure'
+      #       });
 
-            const failureRate = (failures.data.length / deployments.data.length) * 100;
-            console.log(`Change Failure Rate: ${failureRate}%`);
+      #       const failureRate = (failures.data.length / deployments.data.length) * 100;
+      #       console.log(`Change Failure Rate: ${failureRate}%`);
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
       # Run Prometheus Exporter
