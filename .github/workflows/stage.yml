@@ -51,7 +51,7 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            const incidents = await github.issues.listForRepo({
+            const incidents = await octokit.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: 'incident',
@@ -69,11 +69,11 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            const deployments = await github.repos.listDeployments({
+            const deployments = await octokit.repos.listDeployments({
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-            const failures = await github.issues.listForRepo({
+            const failures = await octokit.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: 'deployment-failure'
