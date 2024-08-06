@@ -47,30 +47,30 @@ jobs:
             // Store the data as needed, e.g., in a database or monitoring tool
 
       # Calculate MTTR
-      - name: Calculate MTTR
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const { Octokit } = require("@octokit/rest");
-            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      # - name: Calculate MTTR
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       const { Octokit } = require("@octokit/rest");
+      #       const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-            const incidents = await octokit.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: 'incident',
-              state: 'closed'
-            });
+      #       const incidents = await octokit.issues.listForRepo({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         labels: 'incident',
+      #         state: 'closed'
+      #       });
 
-            const mttr = incidents.data.reduce((total, incident) => {
-              const createdAt = new Date(incident.created_at).getTime();
-              const closedAt = new Date(incident.closed_at).getTime();
-              return total + (closedAt - createdAt);
-            }, 0) / incidents.data.length;
+      #       const mttr = incidents.data.reduce((total, incident) => {
+      #         const createdAt = new Date(incident.created_at).getTime();
+      #         const closedAt = new Date(incident.closed_at).getTime();
+      #         return total + (closedAt - createdAt);
+      #       }, 0) / incidents.data.length;
 
-            console.log(`MTTR: ${mttr / 1000} seconds`);
+      #       console.log(`MTTR: ${mttr / 1000} seconds`);
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Calculate Change Failure Rate
       - name: Calculate Change Failure Rate
