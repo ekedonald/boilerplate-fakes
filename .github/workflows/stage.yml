@@ -1,0 +1,101 @@
+name: CICD Pipeline with DORA Metrics
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Build and Test Steps
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.1'
+      - name: Build
+        run: go build -o learnai_prod
+
+    #   - name: Test
+    #     run: go test -v ./...
+
+      # Record deployment
+      - name: Record deployment
+        run: echo "Deployed at $(date)" >> deployments.log
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Record lead time for changes
+      - name: Record lead time for changes
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const commitTime = execSync('git log -1 --format=%ct').toString().trim();
+            const deployTime = Math.floor(Date.now() / 1000);
+            console.log(`Commit Time: ${commitTime}, Deploy Time: ${deployTime}`);
+            console.log(`Lead Time: ${deployTime - commitTime} seconds`);
+            // Store the data as needed, e.g., in a database or monitoring tool
+
+      # Calculate MTTR
+      - name: Calculate MTTR
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const incidents = await github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'incident',
+              state: 'closed'
+            });
+            const mttr = incidents.data.reduce((total, incident) => {
+              const createdAt = new Date(incident.created_at).getTime();
+              const closedAt = new Date(incident.closed_at).getTime();
+              return total + (closedAt - createdAt);
+            }, 0) / incidents.data.length;
+            console.log(`MTTR: ${mttr / 1000} seconds`);
+
+      # Calculate Change Failure Rate
+      - name: Calculate Change Failure Rate
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const deployments = await github.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const failures = await github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'deployment-failure'
+            });
+            const failureRate = (failures.data.length / deployments.data.length) * 100;
+            console.log(`Change Failure Rate: ${failureRate}%`);
+
+      # Run Prometheus Exporter
+      - name: Run Prometheus Exporter
+        run: |
+          python prometheus_exporter.py &
+          echo $! > exporter.pid
+        env:
+          PROMETHEUS_PORT: 8000
+
+  clean-up:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Stop Prometheus Exporter
+        run: |
+          if [ -f exporter.pid ]; then
+            kill $(cat exporter.pid)
+            rm exporter.pid
+          fi
